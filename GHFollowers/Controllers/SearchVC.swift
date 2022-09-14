@@ -7,16 +7,20 @@
 
 import UIKit
 
-class SearchVC: UIViewController {
+class SearchVC: UIViewController, UITextFieldDelegate {
     //MARK: - Properties
     
+    
+    //Basic github logo image
     private let logoImageView: UIImageView = {
         let iv = UIImageView()
         iv.image = UIImage(named: "gh-logo")
         return iv
     }()
     
+    //Search
     private let usernameTextField = GFTextFeild()
+       
      
     let callToActionButton = GFButton(backgroundColor: .systemGreen, title: "Get Followers")
     
@@ -25,7 +29,9 @@ class SearchVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        
+        dismissKeyboardHelper()
+        usernameTextField.delegate = self
         configureUI()
     }
     
@@ -35,10 +41,15 @@ class SearchVC: UIViewController {
     }
     
     //MARK: - Selectors
+    @objc func dismissKeyboard(){
+        view.endEditing(true)
+    }
     
     
     //MARK: - Helpers
     private func configureUI(){
+        view.backgroundColor = .systemBackground
+        
         view.addSubview(logoImageView)
         
         logoImageView.center(inView: view, yConstant: -200)
@@ -51,8 +62,34 @@ class SearchVC: UIViewController {
         
         view.addSubview(callToActionButton)
         
-        callToActionButton.anchor(top: usernameTextField.bottomAnchor, left: view.leftAnchor, right: view.rightAnchor, paddingTop: 25, paddingLeft: 12, paddingRight: 12, height: 50)
+        callToActionButton.anchor( left: view.leftAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, right: view.rightAnchor, paddingLeft: 12,paddingBottom: 20, paddingRight: 12, height: 50)
+        
+    }
+    
+
+    //Adding a tap gesture recognizer so i can dismiss the keyboard from touching anywhere on the screen
+    private func dismissKeyboardHelper(){
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(tap)
+    }
+    
+    private func ToFaveListVCHelper(){
+        let followerVC = FollowersListVC()
+        
+        
+        navigationController?.pushViewController(followerVC, animated: true)
+        
+        
         
     }
 }
 
+
+extension SearchVC {
+    //On return -> Look up github profile
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        usernameTextField.resignFirstResponder()
+        ToFaveListVCHelper()
+        return true
+    }
+}
