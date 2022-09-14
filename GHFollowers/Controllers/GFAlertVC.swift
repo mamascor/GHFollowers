@@ -33,6 +33,7 @@ class GFAlertVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
     }
     
     
