@@ -22,7 +22,12 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     private let usernameTextField = GFTextFeild()
        
      
-    let callToActionButton = GFButton(backgroundColor: .systemGreen, title: "Get Followers")
+    private lazy var callToActionButton: UIButton = {
+        let button = GFButton(backgroundColor: .systemGreen, title: "Get Followers")
+        button.addTarget(self, action: #selector(handleFave), for: .touchUpInside)
+        
+       return button
+    }()
     
     
     //MARK: - LifeCycle
@@ -43,6 +48,14 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     //MARK: - Selectors
     @objc func dismissKeyboard(){
         view.endEditing(true)
+    }
+    
+    @objc func handleFave(){
+        fetchUserFollower()
+        ToFaveListVCHelper()
+        
+        
+        
     }
     
     
@@ -76,8 +89,34 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     private func ToFaveListVCHelper(){
         let followerVC = FollowersListVC()
         
+        guard let username = usernameTextField.text else {
+            
+            return
+        }
+        
+        if username == "" {
+            let alert = UIAlertController(title: "Error Occured", message: "Need a username to continue", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
+                NSLog("The \"OK\" alert occured.")
+            }))
+            self.present(alert, animated: true, completion: nil)
+        }
+        
+        followerVC.title = "@\(username)"
         
         navigationController?.pushViewController(followerVC, animated: true)
+        
+        
+        
+    }
+    
+    
+    private func fetchUserFollower(){
+        
+        
+        UserManager.shared.fetchUserFollowers("octocat") { success in
+            
+        }
         
         
         
